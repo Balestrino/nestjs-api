@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RootController } from './root/root.controller';
+import { RootService } from './root/root.service';
+import { ConfigModule } from '@nestjs/config';
+import { RootModule } from './root/root.module';
 import appConfig from './config/app.config';
 
 @Module({
@@ -11,8 +12,9 @@ import appConfig from './config/app.config';
       load: [appConfig],
       envFilePath: ['.env'],
     }),
+    RootModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [RootController],
+  providers: [RootService],
 })
 export class AppModule {}
