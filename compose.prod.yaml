@@ -1,0 +1,54 @@
+services:
+  api:
+    container_name: nestjs_api_prod
+    build:
+      context: .
+      target: production
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - app-network
+    restart: unless-stopped
+    # Optional: resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:3000/health']
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # Optional: Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: redis_prod
+    command: redis-server --appendonly yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:
+    name: nestjs_redis_data
+
+networks:
+  app-network:
+    driver: bridge
