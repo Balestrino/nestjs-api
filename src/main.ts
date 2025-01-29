@@ -1,11 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import helmet from 'helmet';
+import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import { AllConfigType } from './config/config.type';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService<AllConfigType>);
   app.use(helmet());
+
+  app.enableShutdownHooks();
+  app.setGlobalPrefix(
+    configService.getOrThrow<string>('app.apiPrefix', { infer: true }),
+    {
+      exclude: ['/'],
+    },
+  );
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -19,7 +30,12 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.getOrThrow('app.port', { infer: true }));
+  // Print NODE_ENV
+  console.log(
+    'NODE_ENV:',
+    configService.getOrThrow('app.nodeEnv', { infer: true }),
+  );
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 void bootstrap();
