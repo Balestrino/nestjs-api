@@ -3,6 +3,7 @@ import { RootController } from './root/root.controller';
 import { RootService } from './root/root.service';
 import { ConfigModule } from '@nestjs/config';
 import { RootModule } from './root/root.module';
+import { UsersModule } from './users/users.module';
 import appConfig from './config/app.config';
 
 @Module({
@@ -13,6 +14,7 @@ import appConfig from './config/app.config';
       envFilePath: ['.env'],
     }),
     RootModule,
+    UsersModule,
   ],
   controllers: [RootController],
   providers: [RootService],
