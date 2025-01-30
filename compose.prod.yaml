@@ -1,32 +1,38 @@
 services:
   api:
-    container_name: nestjs_api_prod
+    container_name: gateway
     build:
       context: .
-      target: production
+      dockerfile: Dockerfile.prod
     ports:
-      - '3000:3000'
+      - '${APP_PORT}:3000'
+    networks:
+      - public
+      - internal
     environment:
       - NODE_ENV=production
-      - PORT=3000
-    networks:
-      - app-network
-    restart: unless-stopped
-    # Optional: resource limits
     deploy:
+      replicas: 1
       resources:
         limits:
           cpus: '1'
           memory: 1G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     healthcheck:
       test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:3000/health']
       interval: 30s
       timeout: 3s
       retries: 3
+    # Add depends_on if you have a database
     # depends_on:
-    #   redis:
-    #     condition: service_healthy
+    #   - postgres
 
 networks:
-  app-network:
-    driver: bridge
+  public:
+    name: public-network # Custom name for public network
+    driver: bridge # Default bridge network, accessible from outside
+  internal:
+    name: private-network # Custom name for internal network
+    external: true # Network is created by infro/compose.dev.yaml

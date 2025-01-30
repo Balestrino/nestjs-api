@@ -10,3 +10,9 @@
 
 - npm install class-transformer
 - docker compose -f compose.dev.yaml exec api npm install class-transformer
+
+# Production
+
+- docker compose -f compose.prod.yaml up -d
+- docker compose -f compose.prod.yaml up -d --build
+- docker compose -f compose.prod.yaml down

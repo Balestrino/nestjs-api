@@ -1,28 +1,5 @@
 ###################
-# DEVELOPMENT
-###################
-FROM node:20-alpine AS development
-
-# Install development tools
-RUN apk add --no-cache python3 make g++ dumb-init
-
-WORKDIR /usr/src/app
-
-# Copy dependency files
-COPY package*.json ./
-
-# Install ALL dependencies (including devDependencies)
-RUN npm ci && npm cache clean --force
-
-# Copy source
-COPY . .
-
-# Use dumb-init and start in development mode
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["npm", "run", "start:dev"]
-
-###################
-# BUILD FOR PRODUCTION
+# BUILD
 ###################
 FROM node:20-alpine AS builder
 
@@ -43,7 +20,7 @@ RUN npm run build && \
 ###################
 # PRODUCTION
 ###################
-FROM node:20-alpine AS production
+FROM node:20-alpine
 
 RUN apk add --no-cache dumb-init && \
     addgroup -g 1001 nodejs && \
