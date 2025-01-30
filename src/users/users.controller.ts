@@ -1,4 +1,18 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { UsersService } from './users.service';
 
-@Controller('users')
-export class UsersController {}
+@Controller()
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get('healthcheck')
+  healthCheck() {
+    return this.usersService.healthCheck();
+  }
+
+  @Get('healthcheck-event')
+  healthCheckEvent() {
+    return this.usersService.healthCheckEvent();
+  }
+}

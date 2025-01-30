@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ClientProxy, Transport } from '@nestjs/microservices';
 import helmet from 'helmet';
 import { AllConfigType } from './config/config.type';
 
@@ -16,6 +17,16 @@ async function bootstrap() {
   //   credentials: true,
   // });
 
+  // app.connectMicroservice({
+  //   transport: Transport.NATS,
+  //   options: {
+  //     servers: [
+  //       `nats://${configService.getOrThrow<string>('app.natsHost', { infer: true })}:${configService.getOrThrow<string>('app.natsPort', { infer: true })}`,
+  //     ],
+  //   },
+  // });
+
+  // Enable shutdown hooks
   app.enableShutdownHooks();
   app.setGlobalPrefix(
     configService.getOrThrow<string>('app.apiPrefix', { infer: true }),

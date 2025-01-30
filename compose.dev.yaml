@@ -18,7 +18,9 @@ services:
     environment:
       - NODE_ENV=development
     logging:
-      driver: 'none'
+      driver: 'local'
+      options:
+        max-size: '10m'
     deploy:
       resources:
         limits:
