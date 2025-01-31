@@ -19,16 +19,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     this.logger.error(
       `Exception: ${exception.message}, stack: ${exception.stack}, request: ${request.url}`,
     );
 
     const responseBody = {
-      status: httpStatus,
-      message: 'Internal Server error 😒',
+      status: exception.status || 'error',
+      statusCode: exception.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      message: exception.message || 'Internal Server error 😒',
     };
 
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+    httpAdapter.reply(
+      ctx.getResponse(),
+      responseBody,
+      exception.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
 }

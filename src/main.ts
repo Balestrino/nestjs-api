@@ -6,6 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AllExceptionsFilter } from './global-filters/all.execptions.filter';
 import { HttpExceptionFilter } from './global-filters/http.execption.filter';
+import { GlobalRpcExceptionFilter } from './global-filters/rpc.execption.filter';
 import { AllConfigType } from './config/config.type';
 
 async function bootstrap() {
@@ -19,9 +20,13 @@ async function bootstrap() {
   // });
 
   // Add global filters
+  // Filters are executed in reverse order (last to first)
   const httpAdapterHost = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
-  app.useGlobalFilters(new HttpExceptionFilter(configService));
+  app.useGlobalFilters(
+    new AllExceptionsFilter(httpAdapterHost),
+    new HttpExceptionFilter(configService),
+    new GlobalRpcExceptionFilter(),
+  );
 
   // Enable shutdown hooks
   app.enableShutdownHooks();
