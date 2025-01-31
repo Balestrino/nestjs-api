@@ -8,6 +8,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 
+interface RpcExceptionResponse {
+  status: string;
+  statusCode: number;
+  message: string;
+  error: any;
+}
+
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
@@ -18,28 +25,29 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
-    const status = exception.getStatus();
+    const statusCode = exception.getStatus();
+    // Access the error object directly from the exception
+    const errorResponse = (exception as any).response;
+    console.log('errorResponse:', errorResponse);
 
     const isProduction =
       this.configService.get<string>('NODE_ENV', { infer: true }) ===
       'production';
 
     this.logger.error(
-      `Exception: ${exception.message}, status: ${status}, url: ${request.url}, method: ${request.method}, ip: ${request.ip}`,
+      `Exception: ${exception.message}, statusCode: ${statusCode}, url: ${request.url}, method: ${request.method}, ip: ${request.ip}`,
     );
 
-    return response.status(status).json(
+    return response.status(statusCode).json(
       isProduction
         ? {
-            statusCode: status,
+            status: 'error',
+            statusCode,
             timestamp: new Date().toISOString(),
             message: exception.message,
           }
         : {
-            statusCode: status,
-            timestamp: new Date().toISOString(),
-            message: exception.message,
-            stacktrace: exception.stack,
+            ...errorResponse,
           },
     );
   }
