@@ -8,13 +8,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 
-interface RpcExceptionResponse {
-  status: string;
-  statusCode: number;
-  message: string;
-  error: any;
-}
-
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
