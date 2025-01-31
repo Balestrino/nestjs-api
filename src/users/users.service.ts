@@ -1,6 +1,13 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
+import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +24,27 @@ export class UsersService {
 
   healthCheckEvent() {
     return this.client.emit('user.healthcheck-event', {});
+  }
+
+  error() {
+    // return this.client.send('user.error', {});
+    return this.client.send('user.error', {}).pipe(
+      catchError((error) => {
+        if (error?.message) {
+          throw new HttpException(
+            {
+              status: error.status || 'error',
+              message: error.message,
+            },
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        throw new HttpException(
+          'Internal server error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }),
+    );
   }
 
   create(createUserDto: CreateUserDto) {

@@ -1,5 +1,4 @@
 import { Controller, Get } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 
 @Controller()
@@ -14,5 +13,10 @@ export class UsersController {
   @Get('healthcheck-event')
   healthCheckEvent() {
     return this.usersService.healthCheckEvent();
+  }
+
+  @Get('error')
+  error() {
+    return this.usersService.error();
   }
 }
