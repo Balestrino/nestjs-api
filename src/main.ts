@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import helmet from 'helmet';
+// import helmet from 'helmet';
 import { AllExceptionsFilter } from './global-filters/all.execptions.filter';
 import { HttpExceptionFilter } from './global-filters/http.execption.filter';
 import { GlobalRpcExceptionFilter } from './global-filters/rpc.execption.filter';
@@ -26,7 +26,7 @@ async function bootstrap() {
     new AllExceptionsFilter(httpAdapterHost),
     new HttpExceptionFilter(configService),
     new GlobalRpcExceptionFilter(),
-  );
+  ); // TODO: check this
 
   // Enable shutdown hooks
   app.enableShutdownHooks();

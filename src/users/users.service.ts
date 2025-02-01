@@ -8,7 +8,6 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
 import { catchError } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +15,6 @@ export class UsersService {
 
   constructor(@Inject('USER_SERVICE') private readonly client: ClientProxy) {
     this.logger.log('UsersService instantiated with USER_SERVICE');
-    this.logger.log(client);
   }
 
   healthCheck() {
@@ -27,29 +25,31 @@ export class UsersService {
     return this.client.emit('user.healthcheck-event', {});
   }
 
-  error(): Observable<any> {
-    // return this.client.send('user.error', {});
-
-    return this.client.send('user.error', {}).pipe(
-      catchError((error) => {
-        if (error?.error) {
-          // It's a developer-friendly error :)
+  error(): Promise<any> {
+    return this.client
+      .send('user.error', {})
+      .pipe(
+        catchError((error) => {
+          if (error?.error) {
+            // It's a developer-friendly error :)
+            throw new HttpException(
+              {
+                status: error.status || 'error',
+                message: error.message,
+                statusCode:
+                  error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+                error: error.error,
+              },
+              HttpStatus.BAD_REQUEST,
+            );
+          }
           throw new HttpException(
-            {
-              status: error.status || 'error',
-              message: error.message,
-              statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-              error: error.error,
-            },
-            HttpStatus.BAD_REQUEST,
+            'Internal server error',
+            HttpStatus.INTERNAL_SERVER_ERROR,
           );
-        }
-        throw new HttpException(
-          'Internal server error',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }),
-    );
+        }),
+      )
+      .toPromise();
   }
 
   create(createUserDto: CreateUserDto) {

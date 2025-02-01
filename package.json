@@ -31,6 +31,7 @@
     "dotenv": "^16.4.7",
     "helmet": "^8.0.0",
     "nats": "^2.29.1",
+    "nestjs-cls": "^5.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

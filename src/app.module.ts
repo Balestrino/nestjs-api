@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { RootModule } from './root/root.module';
 import { UsersModule } from './users/users.module';
 import appConfig from './config/app.config';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -13,6 +12,7 @@ import appConfig from './config/app.config';
       load: [appConfig],
       envFilePath: ['.env'],
     }),
+
     RootModule,
     UsersModule,
   ],
