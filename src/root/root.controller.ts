@@ -16,8 +16,13 @@ import {
 export class RootController {
   constructor(private readonly rootService: RootService) {}
 
-  @Get()
-  getHello(): string {
-    return this.rootService.getHello();
+  @Get('healthcheck')
+  healthCheck() {
+    return this.rootService.healthCheck();
+  }
+
+  @Get('error')
+  error() {
+    return this.rootService.error();
   }
 }
