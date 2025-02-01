@@ -21,37 +21,6 @@ export class UsersService {
     return this.client.send('user.healthcheck', {});
   }
 
-  healthCheckEvent() {
-    return this.client.emit('user.healthcheck-event', {});
-  }
-
-  error(): Promise<any> {
-    return this.client
-      .send('user.error', {})
-      .pipe(
-        catchError((error) => {
-          if (error?.error) {
-            // It's a developer-friendly error :)
-            throw new HttpException(
-              {
-                status: error.status || 'error',
-                message: error.message,
-                statusCode:
-                  error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-                error: error.error,
-              },
-              HttpStatus.BAD_REQUEST,
-            );
-          }
-          throw new HttpException(
-            'Internal server error',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }),
-      )
-      .toPromise();
-  }
-
   create(createUserDto: CreateUserDto) {
     return this.client.send('user.create', createUserDto);
   }

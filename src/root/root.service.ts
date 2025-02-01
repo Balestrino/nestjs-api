@@ -5,19 +5,28 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, NatsRecordBuilder } from '@nestjs/microservices';
+import { ClsService } from 'nestjs-cls';
+import * as nats from 'nats';
 
 import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class RootService {
   private readonly logger = new Logger(RootService.name);
-  constructor(@Inject('ROOT_SERVICE') private readonly client: ClientProxy) {
+  constructor(
+    @Inject('ROOT_SERVICE') private readonly client: ClientProxy,
+    private readonly cls: ClsService,
+  ) {
     this.logger.log('RootService instantiated with ROOT_SERVICE');
   }
 
   healthCheck() {
-    return this.client.send('user.healthcheck', {});
+    console.log('healthCheck correlationId: ', this.cls.get('correlationId'));
+    const headers = nats.headers();
+    headers.set('x-correlation-id', this.cls.get('correlationId'));
+    const record = new NatsRecordBuilder({}).setHeaders(headers).build();
+    return this.client.send('user.healthcheck', record);
   }
 
   error(): Promise<any> {

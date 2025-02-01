@@ -3,10 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport, NatsOptions } from '@nestjs/microservices';
 import { RootService } from './root.service';
 import { RootController } from './root.controller';
-
+import { ClsModule } from 'nestjs-cls';
 @Module({
   imports: [
     ConfigModule,
+    ClsModule,
     ClientsModule.registerAsync([
       {
         name: 'ROOT_SERVICE',
