@@ -16,7 +16,7 @@ import { ClsModule } from 'nestjs-cls';
           transport: Transport.NATS,
           options: {
             servers: [
-              `nats://${configService.getOrThrow<string>('app.natsHost', { infer: true })}:${configService.getOrThrow<string>('app.natsPort', { infer: true })}`,
+              `nats://${configService.getOrThrow<string>('natsHost', { infer: true })}:${configService.getOrThrow<string>('natsPort', { infer: true })}`,
             ],
             queue: 'user_queue',
             // stream: {

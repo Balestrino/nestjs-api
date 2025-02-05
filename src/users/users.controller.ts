@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller({
   path: 'user',
@@ -11,6 +12,11 @@ export class UsersController {
   @Get()
   healthCheck() {
     return this.usersService.healthCheck();
+  }
+
+  @Post()
+  createUser(@Body() request: CreateUserDto) {
+    return this.usersService.create(request);
   }
 
   // @Get('healthcheck-event')

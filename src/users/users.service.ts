@@ -5,7 +5,12 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import {
+  ClientProxy,
+  ClientProxyFactory,
+  Transport,
+} from '@nestjs/microservices';
+import { trace, context, propagation } from '@opentelemetry/api';
 import { CreateUserDto } from './dto/create-user.dto';
 import { catchError } from 'rxjs/operators';
 
@@ -18,11 +23,26 @@ export class UsersService {
   }
 
   healthCheck() {
+    const currentSpan = trace.getActiveSpan();
+    const carrier: Record<string, string> = {};
+
+    // Inject the trace context into the carrier
+    propagation.inject(context.active(), carrier);
+
+    // Send the request with tracing headers
+    return this.client.send('user.healthcheck', {
+      data: 'Hello',
+      traceContext: carrier,
+    });
     return this.client.send('user.healthcheck', {});
   }
 
   create(createUserDto: CreateUserDto) {
     return this.client.send('user.create', createUserDto);
+  }
+
+  getUserByEmail(email: string) {
+    return this.client.send('user.getByEmail', email);
   }
 
   findAll() {

@@ -1,17 +1,18 @@
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // import helmet from 'helmet';
 import { AllExceptionsFilter } from './global-filters/all.execptions.filter';
 import { HttpExceptionFilter } from './global-filters/http.execption.filter';
 import { GlobalRpcExceptionFilter } from './global-filters/rpc.execption.filter';
-import { AllConfigType } from './config/config.type';
+import { validateEnv } from './config/env.validation';
+import tracer from './tracer/tracer';
 
 async function bootstrap() {
+  const validatedEnv = validateEnv(process.env); // Validate environment variables first
+  tracer.start(); // Start the tracer
   const app = await NestFactory.create(AppModule, { cors: true });
-  const configService = app.get(ConfigService<AllConfigType>);
   // app.use(helmet());
   // app.enableCors({
   //   origin: 'http://192.168.88.138:3000',
@@ -24,18 +25,15 @@ async function bootstrap() {
   const httpAdapterHost = app.get(HttpAdapterHost);
   app.useGlobalFilters(
     new AllExceptionsFilter(httpAdapterHost),
-    new HttpExceptionFilter(configService),
-    new GlobalRpcExceptionFilter(),
+    // new HttpExceptionFilter(configService),
+    // new GlobalRpcExceptionFilter(),
   ); // TODO: check this
 
   // Enable shutdown hooks
   app.enableShutdownHooks();
-  app.setGlobalPrefix(
-    configService.getOrThrow<string>('app.apiPrefix', { infer: true }),
-    {
-      exclude: ['/'],
-    },
-  );
+  app.setGlobalPrefix(validatedEnv.API_PREFIX, {
+    exclude: ['/'],
+  });
   app.enableVersioning({
     type: VersioningType.URI,
   });
@@ -64,12 +62,9 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(configService.getOrThrow('app.port', { infer: true }));
+  await app.listen(validatedEnv.APP_PORT);
   // Print NODE_ENV
-  console.log(
-    'NODE_ENV:',
-    configService.getOrThrow('app.nodeEnv', { infer: true }),
-  );
+  console.log('NODE_ENV:', validatedEnv.APP_PORT);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 void bootstrap();
