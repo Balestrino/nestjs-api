@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard'; // Adjust the path as necessary
 import { CurrentUser } from './decorators/current-user.decorator';
-import { CreateUserDto } from 'src/users/dto/create-user.dto'; // Adjust the path as necessary
+import { CreateUserDto } from 'src/api/users/dto/create-user.dto'; // Adjust the path as necessary
 
 @Controller({
   path: 'auth',

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { HttpAdapterHost } from '@nestjs/core';
+import { debug } from 'console';
 // import { exec } from 'child_process';
 
 @Catch()
@@ -35,17 +36,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
     );
 
     // This is the error that is displayed to the user (production mode)
-    const responseBody = {
-      status: exception.status || 'error',
-      statusCode: exception.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+    const productionResponse = {
       message: exception.message || 'Internal Server error 😒',
+    };
+
+    const debugResponse = {
+      message: exception.message || 'Internal Server error 😒',
+      debug: exception.debug || exception.stack,
     };
 
     httpAdapter.reply(
       ctx.getResponse(),
-      isProduction ? responseBody : exception,
-      // responseBody, // This is the production response body
-      exception.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      isProduction ? productionResponse : debugResponse,
+      // productionResponse, // This is the production response body
+      exception.status || HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
 }

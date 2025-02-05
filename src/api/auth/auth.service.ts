@@ -6,8 +6,8 @@ import { Response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { context, trace } from '@opentelemetry/api';
 
-import { UsersService } from 'src/users/users.service';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UsersService } from 'src/api/users/users.service';
+import { CreateUserDto } from 'src/api/users/dto/create-user.dto';
 import { TokenPayload } from './interface/token-payload.interface';
 
 @Injectable()

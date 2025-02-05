@@ -40,13 +40,15 @@
     "dotenv": "^16.4.7",
     "helmet": "^8.0.0",
     "nats": "^2.29.1",
+    "nest-winston": "^1.10.2",
     "nestjs-cls": "^5.0.1",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "uuid": "^11.0.5"
+    "uuid": "^11.0.5",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

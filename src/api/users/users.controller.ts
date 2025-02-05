@@ -14,6 +14,11 @@ export class UsersController {
     return this.usersService.healthCheck();
   }
 
+  @Get('error')
+  error() {
+    return this.usersService.error();
+  }
+
   @Post()
   createUser(@Body() request: CreateUserDto) {
     return this.usersService.create(request);
@@ -24,14 +29,4 @@ export class UsersController {
     console.log('email', email);
     return this.usersService.getUserByEmail(email);
   }
-
-  // @Get('healthcheck-event')
-  // healthCheckEvent() {
-  //   return this.usersService.healthCheckEvent();
-  // }
-
-  // @Get('error')
-  // error() {
-  //   return this.usersService.error();
-  // }
 }

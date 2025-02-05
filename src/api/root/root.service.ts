@@ -38,19 +38,25 @@ export class RootService {
             // It's a developer-friendly error :)
             throw new HttpException(
               {
-                status: error.status || 'error',
                 message: error.message,
-                statusCode:
-                  error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-                error: error.error,
+                status: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+                debug: error.error,
               },
               HttpStatus.BAD_REQUEST,
             );
           }
           throw new HttpException(
-            'Internal server error',
-            HttpStatus.INTERNAL_SERVER_ERROR,
+            {
+              message: error.message,
+              status: HttpStatus.INTERNAL_SERVER_ERROR,
+              debug: error.error,
+            },
+            HttpStatus.BAD_REQUEST,
           );
+          // throw new HttpException(
+          //   'Internal server error',
+          //   HttpStatus.INTERNAL_SERVER_ERROR,
+          // );
         }),
       )
       .toPromise();

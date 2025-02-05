@@ -8,12 +8,16 @@ import { AllExceptionsFilter } from './global-filters/all.execptions.filter';
 // import { HttpExceptionFilter } from './global-filters/http.execption.filter';
 // import { GlobalRpcExceptionFilter } from './global-filters/rpc.execption.filter';
 import { validateEnv } from './config/env.validation';
+import { LoggerFactory } from './logger/logger.factory';
 import tracer from './tracer/tracer';
 
 async function bootstrap() {
   const validatedEnv = validateEnv(process.env); // Validate environment variables first
   tracer.start(); // Start the tracer
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule, {
+    logger: LoggerFactory(validatedEnv.APP_NAME),
+    cors: true,
+  });
   // app.use(helmet());
   // app.enableCors({
   //   origin: 'http://192.168.88.138:3000',
@@ -65,7 +69,7 @@ async function bootstrap() {
 
   await app.listen(validatedEnv.APP_PORT);
   // Print NODE_ENV
-  console.log('NODE_ENV:', validatedEnv.APP_PORT);
+  console.info('NODE_ENV:', validatedEnv.APP_PORT);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 void bootstrap();
