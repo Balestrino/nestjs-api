@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -17,6 +17,12 @@ export class UsersController {
   @Post()
   createUser(@Body() request: CreateUserDto) {
     return this.usersService.create(request);
+  }
+
+  @Get('getByEmail')
+  getUserByEmail(@Query('email') email: string) {
+    console.log('email', email);
+    return this.usersService.getUserByEmail(email);
   }
 
   // @Get('healthcheck-event')

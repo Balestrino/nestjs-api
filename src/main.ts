@@ -2,10 +2,11 @@ import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+// import { ConfigService } from '@nestjs/config';
 // import helmet from 'helmet';
 import { AllExceptionsFilter } from './global-filters/all.execptions.filter';
-import { HttpExceptionFilter } from './global-filters/http.execption.filter';
-import { GlobalRpcExceptionFilter } from './global-filters/rpc.execption.filter';
+// import { HttpExceptionFilter } from './global-filters/http.execption.filter';
+// import { GlobalRpcExceptionFilter } from './global-filters/rpc.execption.filter';
 import { validateEnv } from './config/env.validation';
 import tracer from './tracer/tracer';
 
@@ -24,8 +25,8 @@ async function bootstrap() {
   // Filters are executed in reverse order (last to first)
   const httpAdapterHost = app.get(HttpAdapterHost);
   app.useGlobalFilters(
-    new AllExceptionsFilter(httpAdapterHost),
-    // new HttpExceptionFilter(configService),
+    new AllExceptionsFilter(httpAdapterHost, validatedEnv.NODE_ENV),
+    // new HttpExceptionFilter(validatedEnv.NODE_ENV),
     // new GlobalRpcExceptionFilter(),
   ); // TODO: check this
 

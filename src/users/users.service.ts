@@ -23,18 +23,27 @@ export class UsersService {
   }
 
   healthCheck() {
-    const currentSpan = trace.getActiveSpan();
-    const carrier: Record<string, string> = {};
+    const tracer = trace.getTracer('api-gateway');
 
-    // Inject the trace context into the carrier
-    propagation.inject(context.active(), carrier);
+    // Start a new span with a custom name
+    return tracer.startActiveSpan('gateway/users/healthCheck', (span) => {
+      try {
+        const carrier: Record<string, string> = {};
 
-    // Send the request with tracing headers
-    return this.client.send('user.healthcheck', {
-      data: 'Hello',
-      traceContext: carrier,
+        // Inject the trace context into the carrier
+        propagation.inject(context.active(), carrier);
+
+        return this.client.send('user.healthcheck', {
+          data: 'Hello from API Gateway',
+          traceContext: carrier,
+        });
+      } catch (error) {
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end(); // Ensure the span is properly closed
+      }
     });
-    return this.client.send('user.healthcheck', {});
   }
 
   create(createUserDto: CreateUserDto) {
@@ -42,7 +51,28 @@ export class UsersService {
   }
 
   getUserByEmail(email: string) {
-    return this.client.send('user.getByEmail', email);
+    const tracer = trace.getTracer('api-gateway');
+
+    // Start a new span with a custom name
+    return tracer.startActiveSpan('gateway/users/getUserByEmail', (span) => {
+      try {
+        const carrier: Record<string, string> = {};
+
+        // Inject the trace context into the carrier
+        propagation.inject(context.active(), carrier);
+
+        return this.client.send('user.getByEmail', {
+          data: { email },
+          traceContext: carrier,
+        });
+      } catch (error) {
+        console.log('Error:', error);
+        span.recordException(error);
+        throw error;
+      } finally {
+        span.end(); // Ensure the span is properly closed
+      }
+    });
   }
 
   findAll() {
