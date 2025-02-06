@@ -1,4 +1,5 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, UseInterceptors, Logger } from '@nestjs/common';
+import { Payload } from '@nestjs/microservices';
 import { RootService } from './root.service';
 import {
   ApiBearerAuth,
@@ -14,11 +15,14 @@ import {
 })
 @ApiTags('/')
 export class RootController {
-  constructor(private readonly rootService: RootService) {}
+  constructor(
+    private readonly rootService: RootService,
+    private readonly logger: Logger,
+  ) {}
 
   @Get('healthcheck')
-  healthCheck() {
-    return this.rootService.healthCheck();
+  healthCheck(@Payload() message: any) {
+    return this.rootService.healthCheck(message);
   }
 
   @Get('error')

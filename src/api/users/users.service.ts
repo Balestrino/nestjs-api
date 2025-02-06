@@ -24,7 +24,7 @@ export class UsersService {
   }
 
   healthCheck() {
-    const tracer = trace.getTracer('api-gateway');
+    const tracer = trace.getTracer('microservice');
 
     // Start a new span with a custom name
     return tracer.startActiveSpan('gateway/users/healthCheck', (span) => {

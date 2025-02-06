@@ -1,6 +1,6 @@
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // import { ConfigService } from '@nestjs/config';
 // import helmet from 'helmet';
@@ -9,13 +9,16 @@ import { AllExceptionsFilter } from './global-filters/all.execptions.filter';
 // import { GlobalRpcExceptionFilter } from './global-filters/rpc.execption.filter';
 import { validateEnv } from './config/env.validation';
 import { LoggerFactory } from './logger/logger.factory';
-import tracer from './tracer/tracer';
+
+import { otelSDK } from './tracer/metrics';
 
 async function bootstrap() {
-  const validatedEnv = validateEnv(process.env); // Validate environment variables first
-  tracer.start(); // Start the tracer
+  // Validate environment variables first
+  const validatedEnv = validateEnv(process.env);
+  // Start the OpenTelemetry tracer
+  otelSDK.start();
   const app = await NestFactory.create(AppModule, {
-    logger: LoggerFactory(validatedEnv.APP_NAME),
+    logger: LoggerFactory(validatedEnv),
     cors: true,
   });
   // app.use(helmet());
@@ -36,13 +39,18 @@ async function bootstrap() {
 
   // Enable shutdown hooks
   app.enableShutdownHooks();
+
+  // Set the global prefix
   app.setGlobalPrefix(validatedEnv.API_PREFIX, {
     exclude: ['/'],
   });
+
+  // Enable versioning
   app.enableVersioning({
     type: VersioningType.URI,
   });
 
+  // Enable validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Removes any properties from the incoming request body that are not defined in the DTO. This helps prevent overposting attacks
@@ -69,7 +77,13 @@ async function bootstrap() {
 
   await app.listen(validatedEnv.APP_PORT);
   // Print NODE_ENV
-  console.info('NODE_ENV:', validatedEnv.APP_PORT);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  Logger.log(`NODE_ENV: ${validatedEnv.APP_PORT}`);
+  Logger.log(`Application is running on: ${await app.getUrl()}`);
+
+  // Graceful shutdown
+  process.on('SIGTERM', async () => {
+    await app.close();
+    process.exit(0);
+  });
 }
 void bootstrap();

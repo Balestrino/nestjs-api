@@ -5,6 +5,7 @@ export const configuration = () => {
   return {
     env: validatedConfig.NODE_ENV,
     appName: validatedConfig.APP_NAME,
+    appVersion: validatedConfig.APP_VERSION,
     appPort: validatedConfig.APP_PORT,
     appPortDev: validatedConfig.APP_PORT_DEV,
     apiPrefix: validatedConfig.API_PREFIX,

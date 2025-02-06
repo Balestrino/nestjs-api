@@ -1,13 +1,13 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport, NatsOptions } from '@nestjs/microservices';
 import { RootService } from './root.service';
 import { RootController } from './root.controller';
-import { ClsModule } from 'nestjs-cls';
+// import { ClsModule } from 'nestjs-cls';
 @Module({
   imports: [
     ConfigModule,
-    ClsModule,
+    // ClsModule,
     ClientsModule.registerAsync([
       {
         name: 'ROOT_SERVICE',
@@ -31,7 +31,7 @@ import { ClsModule } from 'nestjs-cls';
       },
     ]),
   ],
-  providers: [RootService],
+  providers: [RootService, Logger],
   controllers: [RootController],
   exports: [RootService, ClientsModule],
 })

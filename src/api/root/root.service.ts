@@ -4,29 +4,33 @@ import {
   Logger,
   HttpException,
   HttpStatus,
+  LoggerService,
 } from '@nestjs/common';
 import { ClientProxy, NatsRecordBuilder } from '@nestjs/microservices';
-import { ClsService } from 'nestjs-cls';
+// import { ClsService } from 'nestjs-cls';
 import * as nats from 'nats';
-
 import { catchError } from 'rxjs/operators';
+import { trace, context, propagation } from '@opentelemetry/api';
 
 @Injectable()
 export class RootService {
   private readonly logger = new Logger(RootService.name);
   constructor(
     @Inject('ROOT_SERVICE') private readonly client: ClientProxy,
-    private readonly cls: ClsService,
+    // private readonly cls: ClsService,
+    // @Inject(Logger) private readonly logger: LoggerService,
   ) {
     this.logger.log('RootService instantiated with ROOT_SERVICE');
   }
 
-  healthCheck() {
-    console.log('healthCheck correlationId: ', this.cls.get('correlationId'));
-    const headers = nats.headers();
-    headers.set('x-correlation-id', this.cls.get('correlationId'));
-    const record = new NatsRecordBuilder({}).setHeaders(headers).build();
-    return this.client.send('user.healthcheck', record);
+  healthCheck(message: any) {
+    const tracer = trace.getTracer('microservice');
+    const span = tracer.startSpan('root/healthCheck');
+    this.logger.log(
+      'root/healthCheck called with message: ' + JSON.stringify(message),
+    );
+    span.end();
+    return { message: 'OK' };
   }
 
   error(): Promise<any> {
